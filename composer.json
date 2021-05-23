@@ -1,0 +1,26 @@
+{
+    "name": "vitorhugoro1/deta-base-php",
+    "description": "Basic Deta Base Http API wrapper.",
+    "authors": [
+        {
+            "name": "Vitor Hugo Rodrigues",
+            "email": "vitorhugo.ro10@gmail.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.3",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "VitorHugoRo\\Deta\\": "src",
+            "VitorHugoRo\\Tests\\": "tests"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
+}
