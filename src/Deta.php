@@ -8,44 +8,37 @@ use VitorHugoRo\Deta\Item;
 
 class Deta
 {
-    private string $baseUrl;
-
-    private string $apiVersion;
-
-    private string $projectKey;
-
-    private string $projectId;
-
-    private ?string $baseName = null;
-
-    private DetaRequest $client;
-
     public function __construct(
-        string $projectId,
-        string $projectKey,
-        ?string $baseName = null,
-        string $baseUrl = 'https://database.deta.sh',
-        string $apiVersion = 'v1'
+        private string $projectId,
+        private string $projectKey,
+        private ?string $baseName = null,
+        private ?DetaRequest $client = null
     ) {
-        $this->projectId = $projectId;
-        $this->projectKey = $projectKey;
-        $this->baseName = $baseName;
-        $this->baseUrl = $baseUrl;
-        $this->apiVersion = $apiVersion;
-
-        $this->client = new DetaRequest(
-            "{$this->baseUrl}/{$this->apiVersion}/{$this->projectId}/",
+        $this->client = $this->client ?? new DetaRequest(
+            $this->projectId,
             $this->projectKey
         );
     }
 
-    public function setBaseName(string $baseName): self
+    /**
+     * Set a Deta Base
+     *
+     * @param string $baseName
+     *
+     * @return Deta
+     */
+    public function setBaseName(string $baseName): Deta
     {
         $this->baseName = $baseName;
 
         return $this;
     }
 
+    /**
+     * Query or Fetch all data from selected Deta Base
+     *
+     * @return \VitorHugoRo\Deta\Responses\QueryResponse
+     */
     public function fetch(): QueryResponse
     {
         if (!$this->baseName) {
@@ -61,6 +54,14 @@ class Deta
         );
     }
 
+    /**
+     * Insert a new item on selected Deta Base,
+     * if not provide an key then this will be automatic generated.
+     *
+     * @param array $params
+     *
+     * @return \VitorHugoRo\Deta\Item
+     */
     public function insert(array $params): Item
     {
         if (!$this->baseName) {
@@ -77,6 +78,9 @@ class Deta
     }
 
     /**
+     * Update a Item from a selected Deta Base
+     * Can update with many ways who you can check on Deta Documentation.
+     *
      * @param string $key
      * @param array $set
      * @param array $increment
@@ -104,6 +108,13 @@ class Deta
         return $this->get($key);
     }
 
+    /**
+     * Get a Item from selected Deta Base
+     *
+     * @param string $key
+     *
+     * @return \VitorHugoRo\Deta\Item
+     */
     public function get(string $key): Item
     {
         if (!$this->baseName) {
@@ -115,6 +126,13 @@ class Deta
         return Item::fromResponse($response);
     }
 
+    /**
+     * Delete a Item from a selected Deta Base then return if is sucessfull
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
     public function delete(string $key): bool
     {
         if (!$this->baseName) {

@@ -6,22 +6,18 @@ use VitorHugoRo\Deta\Exceptions\RequiredItemFieldException;
 
 class Item
 {
-    private $key;
-
-    private $body;
-
-    public function __construct(string $key, array $body)
-    {
-        $this->key = $key;
-        $this->body = $body;
+    public function __construct(
+        private string $key,
+        private array $body
+    ) {
     }
 
-    public function getKey()
+    public function getKey(): string
     {
         return $this->key;
     }
 
-    public function getBody()
+    public function getBody(): array
     {
         return $this->body;
     }

@@ -4,56 +4,90 @@ namespace VitorHugoRo\Tests;
 
 use PHPUnit\Framework\TestCase;
 use VitorHugoRo\Deta\Deta;
+use VitorHugoRo\Deta\DetaRequest;
 use VitorHugoRo\Deta\Item;
 use VitorHugoRo\Deta\Responses\QueryResponse;
 
 class DetaTest extends TestCase
 {
-    protected Deta $service;
-
-    protected function setUp(): void
+    public function testCanGetItemsFromBase()
     {
-        parent::setUp();
+        /** @var DetaRequest|\PHPUnit\Framework\MockObject\MockObject */
+        $detaRequesterMock = $this->createMock(DetaRequest::class);
 
-        $this->service = new Deta(
-            "include an key here",
-            "include an key here",
-            "items"
-        );
-    }
-
-    /** @test */
-    public function canGetItemsFromBase()
-    {
-        $temporaryBase = rand();
-
-        $this->service->setBaseName($temporaryBase);
-
-        foreach (range(1, 3) as $i) {
-            $this->service->insert([
-                'field1' => $i
+        $detaRequesterMock->expects($this->once())
+            ->method('request')
+            ->willReturn([
+                'paging' => [
+                    'size' => 2,
+                    'last' => null
+                ],
+                'items' => [
+                    [
+                        'key' => mt_rand(),
+                        'field1' => 1
+                    ],
+                    [
+                        'key' => mt_rand(),
+                        'field1' => 2
+                    ],
+                ]
             ]);
-        }
 
-        $response = $this->service->fetch();
+        $service = new Deta(
+            "include an key here",
+            "include an key here",
+            "items",
+            $detaRequesterMock
+        );
+
+        $service->setBaseName(rand());
+
+        $response = $service->fetch();
 
         $this->assertInstanceOf(QueryResponse::class, $response);
 
         $this->assertInstanceOf(Item::class, $response->first());
 
-        // $this->assertContains(1, $response->first()->getBody());
+        $this->assertContains(1, $response->first()->getBody());
 
-        $this->assertCount(3, $response->items());
-
-        $this->service->setBaseName('items');
+        $this->assertCount(2, $response->items());
     }
 
     /** @test */
     public function canInsertOnBase()
     {
-        $response = $this->service->insert([
+        /** @var DetaRequest|\PHPUnit\Framework\MockObject\MockObject */
+        $detaRequesterMock = $this->createMock(DetaRequest::class);
+
+        $baseName = rand();
+
+        $detaRequesterMock->expects($this->once())
+            ->method('request')
+            ->with(
+                $this->equalTo("POST"),
+                $this->equalTo("{$baseName}/items")
+            )
+            ->willReturn([
+                'key' => 1,
+                'field1' => '123'
+            ]);
+
+        $service = new Deta(
+            "include an key here",
+            "include an key here",
+            "items",
+            $detaRequesterMock
+        );
+
+        $service->setBaseName($baseName);
+
+        $inputData = [
+            'key' => 1,
             'field1' => '123'
-        ]);
+        ];
+
+        $response = $service->insert($inputData);
 
         $this->assertInstanceOf(Item::class, $response);
 
@@ -64,16 +98,50 @@ class DetaTest extends TestCase
     /** @test */
     public function canUpdateAnItem()
     {
-        $item = $this->service->insert([
-            'setField' => '123',
-            'incrementField' => 1,
-            'appendField' => ['item'],
-            'prependField' => ['some', 'items'],
-            'deleteField' => 'something'
-        ]);
+        /** @var DetaRequest|\PHPUnit\Framework\MockObject\MockObject */
+        $detaRequesterMock = $this->createMock(DetaRequest::class);
 
-        $updatedItem = $this->service->update(
-            $item->getKey(),
+        $detaRequesterMock->expects($this->any())
+            ->method('request')
+            ->willReturn(
+                [
+                    'key' => 1,
+                    'set' => [
+                        'setField' => '321'
+                    ],
+                    'increment' => [
+                        'incrementField' => 1
+                    ],
+                    'append' => [
+                        'appendField' => ['something']
+                    ],
+                    'prepend' => [
+                        'prependField' => ['items']
+                    ],
+                    'delete' => [
+                        'deleteField'
+                    ],
+                ],
+                [
+                    'key' => 1,
+                    'setField' => '321',
+                    'incrementField' => 2,
+                    'appendField' => ['item', 'something'],
+                    'prependField' => ['items', 'some', 'items']
+                ]
+            );
+
+        $service = new Deta(
+            "include an key here",
+            "include an key here",
+            "items",
+            $detaRequesterMock
+        );
+
+        $service->setBaseName(rand());
+
+        $updatedItem = $service->update(
+            1,
             [
                 'setField' => '321'
             ],
@@ -104,9 +172,48 @@ class DetaTest extends TestCase
     /** @test */
     public function canSeeItem()
     {
-        $item = $this->service->fetch()->first();
+        /** @var DetaRequest|\PHPUnit\Framework\MockObject\MockObject */
+        $detaRequesterMock = $this->createMock(DetaRequest::class);
 
-        $gettedItem = $this->service->get($item->getKey());
+        $baseName = rand();
+
+        $detaRequesterMock->expects($this->any())
+            ->method('request')
+            ->willReturn(
+                [
+                    'paging' => [
+                        'size' => 2,
+                        'last' => null
+                    ],
+                    'items' => [
+                        [
+                            'key' => 1,
+                            'field1' => 1
+                        ],
+                        [
+                            'key' => mt_rand(),
+                            'field1' => 2
+                        ],
+                    ]
+                ],
+                [
+                    'key' => 1,
+                    'field1' => 1
+                ]
+            );
+
+        $service = new Deta(
+            "include an key here",
+            "include an key here",
+            "items",
+            $detaRequesterMock
+        );
+
+        $service->setBaseName($baseName);
+
+        $item = $service->fetch()->first();
+
+        $gettedItem = $service->get($item->getKey());
 
         $this->assertEquals($item, $gettedItem);
     }
@@ -114,9 +221,25 @@ class DetaTest extends TestCase
     /** @test */
     public function canDeleteItem()
     {
-        $item = $this->service->fetch()->first();
+        /** @var DetaRequest|\PHPUnit\Framework\MockObject\MockObject */
+        $detaRequesterMock = $this->createMock(DetaRequest::class);
 
-        $deleted = $this->service->delete($item->getKey());
+        $detaRequesterMock->expects($this->once())
+            ->method('request')
+            ->willReturn([
+                'key' => "1"
+            ]);
+
+        $service = new Deta(
+            "include an key here",
+            "include an key here",
+            "items",
+            $detaRequesterMock
+        );
+
+        $service->setBaseName(rand());
+
+        $deleted = $service->delete("1");
 
         $this->assertTrue($deleted);
     }
