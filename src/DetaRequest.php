@@ -3,19 +3,19 @@
 namespace VitorHugoRo\Deta;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use VitorHugoRo\Deta\Exceptions\RequestException;
 
 class DetaRequest
 {
-    private Client $client;
-
     public function __construct(
         private string $projectId,
         private string $projectKey,
-        private string $baseUri = 'https://database.deta.sh/v1'
+        private string $baseUri = 'https://database.deta.sh/v1',
+        private ?ClientInterface $client = null
     ) {
-        $this->client = new Client([
+        $this->client = $client ?? new Client([
             'base_uri' => "{$this->baseUri}/{$this->projectId}/",
             'headers' => [
                 'X-API-Key' => $this->projectKey,
@@ -23,6 +23,13 @@ class DetaRequest
             ],
             'http_errors' => false
         ]);
+    }
+
+    public function setClient(ClientInterface $client): DetaRequest
+    {
+        $this->client = $client;
+
+        return $this;
     }
 
     public function request(string $method, string $uri, array $options = []): array
