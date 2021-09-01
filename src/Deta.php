@@ -8,38 +8,19 @@ use VitorHugoRo\Deta\Item;
 
 class Deta
 {
-    private string $baseUrl;
-
-    private string $apiVersion;
-
-    private string $projectKey;
-
-    private string $projectId;
-
-    private ?string $baseName = null;
-
-    private DetaRequest $client;
-
     public function __construct(
-        string $projectId,
-        string $projectKey,
-        ?string $baseName = null,
-        string $baseUrl = 'https://database.deta.sh',
-        string $apiVersion = 'v1'
+        private string $projectId,
+        private string $projectKey,
+        private ?string $baseName = null,
+        private ?DetaRequest $client = null
     ) {
-        $this->projectId = $projectId;
-        $this->projectKey = $projectKey;
-        $this->baseName = $baseName;
-        $this->baseUrl = $baseUrl;
-        $this->apiVersion = $apiVersion;
-
-        $this->client = new DetaRequest(
-            "{$this->baseUrl}/{$this->apiVersion}/{$this->projectId}/",
+        $this->client = $this->client ?? new DetaRequest(
+            $this->projectId,
             $this->projectKey
         );
     }
 
-    public function setBaseName(string $baseName): self
+    public function setBaseName(string $baseName): Deta
     {
         $this->baseName = $baseName;
 

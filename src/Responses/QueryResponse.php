@@ -6,31 +6,19 @@ use VitorHugoRo\Deta\Item;
 
 class QueryResponse
 {
-    /**
-     * @var array<Item>
-     */
-    private array $items;
-
-    private int $size;
-
-    private ?string $lastKey;
-
     public function __construct(
-        array $items,
-        int $size,
-        ?string $lastKey = null
+        private array $items,
+        private int $size,
+        private ?string $lastKey = null
     ) {
-        $this->items = $items;
-        $this->size = $size;
-        $this->lastKey = $lastKey;
     }
 
-    public function getLastKey()
+    public function getLastKey(): ?string
     {
         return $this->lastKey;
     }
 
-    public function getSize()
+    public function getSize(): int
     {
         return $this->size;
     }
