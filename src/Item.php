@@ -2,9 +2,10 @@
 
 namespace VitorHugoRo\Deta;
 
+use ArrayAccess;
 use VitorHugoRo\Deta\Exceptions\RequiredItemFieldException;
 
-class Item
+class Item implements ArrayAccess
 {
     public function __construct(
         private string $key,
@@ -20,6 +21,30 @@ class Item
     public function getBody(): array
     {
         return $this->body;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        return isset($this->body[$offset]);
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        return isset($this->body[$offset]) ? $this->body[$offset] : null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        if (is_null($offset)) {
+            $this->body[] = $value;
+        } else {
+            $this->body[$offset] = $value;
+        }
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        unset($this->body[$offset]);
     }
 
     public static function fromResponse(array $params): self
