@@ -1,5 +1,8 @@
 # Basic PHP Wrapper for Deta Base
 
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/vitorhugoro1/deta-base-php.svg?style=flat-square)](https://packagist.org/packages/vitorhugoro1/deta-base-php)
+[![Total Downloads](https://img.shields.io/packagist/dt/vitorhugoro1/deta-base-php.svg?style=flat-square)](https://packagist.org/packages/vitorhugoro1/deta-base-php)
+
 A wrapper to [Http API](https://docs.deta.sh/docs/base/http) for Deta Base, you can find more information about Deta Base [here](https://docs.deta.sh/docs/base/about).
 
 ## Installation
@@ -34,6 +37,14 @@ On `Deta` class, do you have access to all this available actions:
 composer test
 ```
 
+## Changelog
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
+## Contributing
+
+Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+
 ## Security
 
 If you discover any security related issues, please email vitorhugo.ro10@gmail.com instead of using the issue tracker.
@@ -42,3 +53,7 @@ If you discover any security related issues, please email vitorhugo.ro10@gmail.c
 
 - [Vitor Merencio](https://github.com/vitorhugoro1)
 - [All Contributors](../../contributors)
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
